@@ -1023,7 +1023,7 @@ s8_l get_txpwr_max(s8_l power)
 	    }
 	}
 
-	printk("%s:txpwr_max:%d \r\n",__func__,power);
+	AICWFDBG(LOGDEBUG, "%s:txpwr_max:%d \r\n",__func__,power);
 	return power;
 }
 

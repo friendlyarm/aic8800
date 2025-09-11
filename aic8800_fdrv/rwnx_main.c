@@ -512,7 +512,7 @@ static const int rwnx_hwq2uapsd[NL80211_NUM_ACS] = {
 
 
 extern uint8_t scanning;
-int aicwf_dbg_level = LOGERROR|LOGINFO|LOGDEBUG|LOGTRACE;
+int aicwf_dbg_level = LOGERROR;
 module_param(aicwf_dbg_level, int, 0660);
 int testmode = 0;
 char aic_fw_path[200];
@@ -1617,8 +1617,7 @@ static struct rwnx_vif *rwnx_interface_add(struct rwnx_hw *rwnx_hw,
 
 	}
 
-	AICWFDBG(LOGINFO, "interface add:%x %x %x %x %x %x\n", vif->wdev.address[0], vif->wdev.address[1], \
-		vif->wdev.address[2], vif->wdev.address[3], vif->wdev.address[4], vif->wdev.address[5]);
+	AICWFDBG(LOGINFO, "interface add: %pM\n", vif->wdev.address);
 
 	if (params) {
 		vif->use_4addr = params->use_4addr;
@@ -1787,8 +1786,7 @@ static struct wireless_dev *rwnx_virtual_interface_add(struct rwnx_hw *rwnx_hw,
 
 	memcpy(vif->wdev.address, rwnx_hw->wiphy->perm_addr, ETH_ALEN);
 	vif->wdev.address[5] ^= vif_idx;
-	printk("p2p dev addr=%x %x %x %x %x %x\n", vif->wdev.address[0], vif->wdev.address[1], \
-		vif->wdev.address[2], vif->wdev.address[3], vif->wdev.address[4], vif->wdev.address[5]);
+	printk("aicfdrv: p2p dev addr=%pM\n", vif->wdev.address);
 
 	return wdev;
 }
