@@ -1,3 +1,5 @@
+ifneq ($(KERNELRELEASE),)
+
 EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
 EXTRA_CFLAGS += -Wno-implicit-fallthrough
 #EXTRA_CFLAGS += -Wno-unused-function
@@ -19,7 +21,6 @@ CONFIG_PMIC_SETTING ?=y
 
 # Select 8800DC/DW DCDC_VRF mode, check your board
 CONFIG_VRF_DCDC_MODE = y
-
 
 # ROM patch enabled option
 CONFIG_ROM_PATCH_EN ?=y
@@ -152,7 +153,6 @@ CONFIG_RWNX_MON_DATA = n
 CONFIG_RWNX_MON_XMIT = n
 CONFIG_RWNX_MON_RXFILTER = n
 
-
 # extra DEBUG config
 CONFIG_RWNX_SW_PROFILING ?= n
 CONFIG_RWNX_DBG ?= y
@@ -207,8 +207,6 @@ $(MODULE_NAME)-$(CONFIG_USB_SUPPORT)     += aicwf_txrxif.o
 $(MODULE_NAME)-$(CONFIG_USB_SUPPORT)     += aicwf_usb.o
 $(MODULE_NAME)-$(CONFIG_GKI)     += rwnx_gki.o
 
-
-
 ccflags-$(CONFIG_DEBUG_FS) += -DCONFIG_RWNX_DEBUGFS
 ccflags-$(CONFIG_DEBUG_FS) += -DCONFIG_RWNX_UM_HELPER_DFLT=\"$(CONFIG_RWNX_UM_HELPER_DFLT)\"
 ccflags-$(CONFIG_RWNX_P2P_DEBUGFS) += -DCONFIG_RWNX_P2P_DEBUGFS
@@ -248,7 +246,6 @@ ccflags-y += -DCONFIG_RWNX_FULLMAC
 ccflags-y += -I$(srctree)
 ccflags-y += -I$(srctree)/$(src)
 ccflags-y += -I$(srctree)/$(src)/../aic8800_bsp
-ccflags-y += -DCONFIG_AIC_FW_PATH=\"$(CONFIG_AIC_FW_PATH)\"
 ccflags-$(CONFIG_RWNX_RADAR) += -DCONFIG_RWNX_RADAR
 ccflags-$(CONFIG_RWNX_MON_DATA) += -DCONFIG_RWNX_MON_DATA
 ccflags-$(CONFIG_RWNX_MON_XMIT) += -DCONFIG_RWNX_MON_XMIT
@@ -298,7 +295,6 @@ ccflags-$(CONFIG_SHUTDOWN_CALLBACK) += -DCONFIG_SHUTDOWN_CALLBACK
 ccflags-$(CONFIG_FOR_IPCAM) += -DCONFIG_FOR_IPCAM
 ccflags-$(CONFIG_SDIO_ADMA) += -DCONFIG_SDIO_ADMA
 
-
 ifeq ($(CONFIG_SDIO_SUPPORT), y)
 ccflags-y += -DAICWF_SDIO_SUPPORT
 ccflags-$(CONFIG_SDIO_PWRCTRL) += -DCONFIG_SDIO_PWRCTRL
@@ -341,7 +337,8 @@ ccflags-$(CONFIG_APF) += -DCONFIG_APF
 ccflags-$(CONFIG_AUTO_POWERSAVE) += -DCONFIG_AUTO_POWERSAVE
 
 ccflags-y += -DAIC_TRACE_INCLUDE_PATH=$(src)
-MAKEFLAGS +=-j$(shell nproc)
+
+else
 
 ########## Platform support list ##########
 CONFIG_PLATFORM_ROCKCHIP ?= n
@@ -352,35 +349,25 @@ CONFIG_PLATFORM_AMLOGIC ?= n
 CONFIG_PLATFORM_UBUNTU ?= y
 
 ifeq ($(CONFIG_PLATFORM_ROCKCHIP), y)
-ARCH := arm64
-KDIR ?= /home/yaya/E/Rockchip/3566/firefly/Android11.0/Firefly-RK356X_Android11.0_git_20210824/RK356X_Android11.0/kernel
-CROSS_COMPILE := /home/yaya/E/Rockchip/3566/firefly/Android11.0/Firefly-RK356X_Android11.0_git_20210824/RK356X_Android11.0/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
 ccflags-$(CONFIG_PLATFORM_ROCKCHIP) += -DCONFIG_PLATFORM_ROCKCHIP
 ccflags-y += -DANDROID_PLATFORM
+ARCH := arm64
 endif
 
 ifeq ($(CONFIG_PLATFORM_ROCKCHIP2), y)
-ARCH := arm64
-KDIR ?= /home/yaya/E/Rockchip/3566/firefly/Android11.0/Firefly-RK356X_Android11.0_git_20210824/RK356X_Android11.0/kernel
-CROSS_COMPILE := /home/yaya/E/Rockchip/3566/firefly/Android11.0/Firefly-RK356X_Android11.0_git_20210824/RK356X_Android11.0/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-
 ccflags-$(CONFIG_PLATFORM_ROCKCHIP2) += -DCONFIG_PLATFORM_ROCKCHIP2
 ccflags-y += -DANDROID_PLATFORM
+ARCH := arm64
 endif
-
 
 ifeq ($(CONFIG_PLATFORM_ALLWINNER), y)
 ccflags-$(CONFIG_PLATFORM_ALLWINNER) += -DCONFIG_PLATFORM_ALLWINNER
 ccflags-y += -DANDROID_PLATFORM
-KDIR  ?= /home/yaya/E/Allwinner/r818/Android10/lichee/kernel/linux-4.9/
 ARCH ?= arm64
-CROSS_COMPILE ?= /home/yaya/E/Allwinner/r818/Android10/android/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 endif
 
 ifeq ($(CONFIG_PLATFORM_INGENIC_T20), y)
-KDIR ?= /home/yaya/E/T40/kernel
 ARCH ?= mips
-CROSS_COMPILE ?= /home/yaya/E/T40/mips-linux-gnu-ingenic-gcc7.2.0-glibc2.29-fp64/bin/mips-linux-gnu-
 endif
 
 ifeq ($(CONFIG_PLATFORM_AMLOGIC), y)
@@ -390,15 +377,14 @@ endif
 
 ifeq ($(CONFIG_PLATFORM_UBUNTU), y)
 ccflags-$(CONFIG_PLATFORM_UBUNTU) += -DCONFIG_PLATFORM_UBUNTU
-KDIR  ?= /lib/modules/$(shell uname -r)/build
-PWD   ?= $(shell pwd)
+KDIR ?= /lib/modules/$(shell uname -r)/build
+PWD  ?= $(shell pwd)
 KVER ?= $(shell uname -r)
 MODDESTDIR ?= /lib/modules/$(KVER)/kernel/drivers/net/wireless/
 ARCH ?= x86_64
 CROSS_COMPILE ?=
 endif
 ###########################################
-
 
 all: modules
 modules:
@@ -416,4 +402,4 @@ uninstall:
 clean:
 	rm -rf *.o *.ko *.o.* *.mod.* modules.* Module.* .a* .o* .*.o.* *.mod .tmp* .cache.mk
 
-
+endif

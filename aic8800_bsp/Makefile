@@ -1,8 +1,11 @@
+ifneq ($(KERNELRELEASE),)
+
 CONFIG_SDIO_SUPPORT := y
 CONFIG_SDIO_PWRCTRL := y
-CONFIG_AIC_FW_PATH = "/vendor/etc/firmware"
-#CONFIG_AIC_FW_PATH = "/lib/firmware/aic8800D80"
-export CONFIG_AIC_FW_PATH
+
+ifeq ($(CONFIG_AIC_FW_PATH),)
+CONFIG_AIC_FW_PATH = "/lib/firmware/aic"
+endif
 ccflags-y += -DCONFIG_AIC_FW_PATH=\"$(CONFIG_AIC_FW_PATH)\"
 
 MODULE_NAME := aic8800_bsp
@@ -62,7 +65,6 @@ ccflags-$(CONFIG_SDIO_BT) += -DCONFIG_SDIO_BT
 ccflags-$(CONFIG_RADAR_OR_IR_DETECT) += -DCONFIG_RADAR_OR_IR_DETECT
 ccflags-$(CONFIG_FOR_IPCAM) += -DCONFIG_FOR_IPCAM
 
-
 obj-m := $(MODULE_NAME).o
 $(MODULE_NAME)-y := \
 	aic8800dc_compat.o \
@@ -79,6 +81,8 @@ ifeq ($(CONFIG_FIRMWARE_ARRAY),y)
 $(MODULE_NAME)-y +=	aicwf_firmware_array.o
 endif
 
+else
+
 ########## Platform support list ##########
 CONFIG_PLATFORM_ROCKCHIP ?= n
 CONFIG_PLATFORM_ROCKCHIP2 ?= n
@@ -89,43 +93,32 @@ CONFIG_PLATFORM_UBUNTU ?= y
 
 ifeq ($(CONFIG_PLATFORM_ROCKCHIP), y)
 ccflags-$(CONFIG_PLATFORM_ROCKCHIP) += -DCONFIG_PLATFORM_ROCKCHIP
-KDIR ?= /home/yaya/E/Rockchip/3566/firefly/Android11.0/Firefly-RK356X_Android11.0_git_20210824/RK356X_Android11.0/kernel
 ARCH ?= arm64
-CROSS_COMPILE ?= /home/yaya/E/Rockchip/3566/Android11/rk3566_rk3568_android11_oranth/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
 endif
 
 ifeq ($(CONFIG_PLATFORM_ROCKCHIP2), y)
 ccflags-$(CONFIG_PLATFORM_ROCKCHIP2) += -DCONFIG_PLATFORM_ROCKCHIP2
 ARCH ?= arm64
-KDIR ?= /home/yaya/E/Rockchip/3566/firefly/Android11.0/Firefly-RK356X_Android11.0_git_20210824/RK356X_Android11.0/kernel
-CROSS_COMPILE ?= /home/yaya/E/Rockchip/3566/firefly/Android11.0/Firefly-RK356X_Android11.0_git_20210824/RK356X_Android11.0/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
 endif
 
 ifeq ($(CONFIG_PLATFORM_ALLWINNER), y)
 ccflags-$(CONFIG_PLATFORM_ALLWINNER) += -DCONFIG_PLATFORM_ALLWINNER
-KDIR  ?= /home/yaya/E/Allwinner/r818/Android10/lichee/kernel/linux-4.9/
 ARCH ?= arm64
-CROSS_COMPILE ?= /home/yaya/E/Allwinner/r818/Android10/android/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
-
 endif
 
 ifeq ($(CONFIG_PLATFORM_INGENIC_T20), y)
-KDIR ?= /home/yaya/E/T40/kernel
 ARCH ?= mips
-CROSS_COMPILE ?= /home/yaya/E/T40/mips-linux-gnu-ingenic-gcc7.2.0-glibc2.29-fp64/bin/mips-linux-gnu-
 endif
 
 ifeq ($(CONFIG_PLATFORM_AMLOGIC), y)
 ccflags-$(CONFIG_PLATFORM_AMLOGIC) += -DCONFIG_PLATFORM_AMLOGIC
-KDIR  ?= /home/aiden/D1/SDK/Amlogic/905x3_a9/android9.0/out/target/product/u202/obj/KERNEL_OBJ/
 ARCH ?= arm
-CROSS_COMPILE ?= /home/aiden/D1/SDK/Amlogic/905x3_a9/android9.0/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
 endif
 
 ifeq ($(CONFIG_PLATFORM_UBUNTU), y)
 ccflags-$(CONFIG_PLATFORM_UBUNTU) += -DCONFIG_PLATFORM_UBUNTU
-KDIR  ?= /lib/modules/$(shell uname -r)/build
-PWD   ?= $(shell pwd)
+KDIR ?= /lib/modules/$(shell uname -r)/build
+PWD  ?= $(shell pwd)
 KVER ?= $(shell uname -r)
 MODDESTDIR ?= /lib/modules/$(KVER)/kernel/drivers/net/wireless/
 ARCH ?= x86_64
@@ -149,3 +142,4 @@ uninstall:
 clean:
 	rm -rf *.o *.ko *.o.* *.mod.* modules.* Module.* .a* .o* .*.o.* *.mod .tmp* .cache.mk built-in.a
 
+endif
