@@ -289,12 +289,17 @@ static int aic_priv_cmd_set_tx (struct rwnx_hw *rwnx_hw, int argc, char *argv[],
 			lvl_band = 2;
 		else
 			lvl_band = 1;
+
 		if (settx_param.mode == 0)
 			lvl_mod = 0;
 		else if (settx_param.mode == 2 || settx_param.mode == 4)
 			lvl_mod = 1;
 		else if (settx_param.mode == 5)
 			lvl_mod = 2;
+		else
+			lvl_mod = 0;
+		AICWFDBG(LOGINFO, "mode: %d, lvl_mod: %d\n", settx_param.mode, lvl_mod);
+
 		if (settx_param.mode >= 4)
 			lvl_idx = settx_param.rate & 0xF;
 		else if (settx_param.mode >= 2)
