@@ -356,6 +356,8 @@ ccflags-$(CONFIG_AUTO_POWERSAVE) += -DCONFIG_AUTO_POWERSAVE
 
 ccflags-y += -DAIC_TRACE_INCLUDE_PATH=$(src)
 
+ccflags-y += -Wno-missing-declarations -Wno-missing-prototypes
+
 else
 
 ########## Platform support list ##########

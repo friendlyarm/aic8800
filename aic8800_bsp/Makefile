@@ -74,6 +74,8 @@ ccflags-$(CONFIG_BAND_STEERING) += -DCONFIG_BAND_STEERING
 ccflags-$(CONFIG_PRBREQ_REPORT) += -DCONFIG_PRBREQ_REPORT
 ccflags-$(CONFIG_GPIO_SET) += -DCONFIG_GPIO_SET
 
+ccflags-y += -Wno-missing-declarations -Wno-missing-prototypes
+
 obj-m := $(MODULE_NAME).o
 $(MODULE_NAME)-y := \
 	aic8800dc_compat.o \
